@@ -2,6 +2,9 @@
     padding: 2%;
 }
 
+.card .card-action:last-child{
+    margin: auto;
+}
 .row-head {
     margin: 2% auto;
 }
