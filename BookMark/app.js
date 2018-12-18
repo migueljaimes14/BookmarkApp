@@ -15,8 +15,6 @@ function savebookmark(e) {
         url: siteUrl.value
     }
 
-    console.log(bookmark);
-
     if (validateInput(bookmark.name, bookmark.url)) {
         //Prueba si el bookmark es vacio o nulo
         if (!localStorage.getItem('bookmarks')) {
@@ -50,7 +48,6 @@ function savebookmark(e) {
 }
 
 function deleteBookmark(id) {
-    console.log("Entro");
 
     let bookmarks = JSON.parse(localStorage.getItem('bookmarks'));
     //filter
@@ -67,8 +64,6 @@ function deleteBookmark(id) {
 function fetchBookmarks() {
     //tomamos los bookmarks del locastorage
     let bookmarks = JSON.parse(localStorage.getItem('bookmarks'));
-
-    console.log(bookmarks);
 
     bookmarksResult.innerHTML = '';
     //map
@@ -89,8 +84,6 @@ function fetchBookmarks() {
     });
 
     bookmarkElements.forEach(element => bookmarksResult.innerHTML += element);
-
-
 
 }
 
