@@ -1,4 +1,3 @@
-//Escucha la accion del submit
 let myForm = document.querySelector('#myForm');
 let siteName = document.querySelector('#siteName');
 let siteUrl = document.querySelector('#siteUrl');
@@ -6,36 +5,38 @@ let bookmarksResult = document.querySelector('#bookmarksResult');
 
 //Guarda la informacion del usuario
 function savebookmark(e) {
-    //REVISAR
-    // if (!validateForm(siteName,siteUrl)) {
-    //     return false;
-    // }
-    // console.log('salio');
-    
-    //inicializo el array
+
     let bookmark = {
+        id: createId(),
         name: siteName.value,
         url: siteUrl.value
     }
 
-    //Prueba si el bookmark es vacio o nulo
-    if (!localStorage.getItem('bookmarks')) {
-        //inicializo el array
-        let bookmarks = [];
-        //Agregas al array
-        bookmarks.push(bookmark);
-        //En el LocalStorage
-        localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+    console.log(bookmark);
+
+    if (validateInput(bookmark.name, bookmark.url)) {
+        //Prueba si el bookmark es vacio o nulo
+        if (!localStorage.getItem('bookmarks')) {
+            //inicializo el array
+            let bookmarks = [];
+            //Agregas al array
+            bookmarks.push(bookmark);
+            //En el LocalStorage
+            localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+        } else {
+            //agregando bookmarks al localStorage
+            let bookmarks = JSON.parse(localStorage.getItem('bookmarks'));
+            //Agregando al array
+            bookmarks.push(bookmark);
+            //Re-set el LocalStorage
+            localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+        }
+        notification(1)
     } else {
-        //agregando bookmarks al localStorage
-        let bookmarks = JSON.parse(localStorage.getItem('bookmarks'));
-        //Agregando al array
-        bookmarks.push(bookmark);
-        //Re-set el LocalStorage
-        localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+        notification(2)
+
     }
 
-    myForm.reset();
 
     fetchBookmarks();
     //Permite visualizar el submit
@@ -55,6 +56,7 @@ function deleteBookmark(url) {
     //Re-set el LocalStorage
     localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
     fetchBookmarks();
+    notification(3)
 }
 
 function fetchBookmarks() {
@@ -69,10 +71,10 @@ function fetchBookmarks() {
         let name = bookmarks[index].name;
         let url = bookmarks[index].url;
 
-        bookmarksResult.innerHTML += '<div class="divider"></div>' +
+        bookmarksResult.innerHTML += '<div class="divider white-text"></div>' +
             '<div class="row">' +
             '<div class="col s12 m12 l12">' +
-            '<div class="card blue-grey darken-1">' +
+            '<div class="card #e65100 orange darken-4" style:border-radius: 2% 2% 2% 2%;>' +
             '<div class="card-content white-text">' +
             '<span class="card-title center-align">' +
             name +
@@ -88,28 +90,51 @@ function fetchBookmarks() {
 
 }
 
-// REVISAR!!!
-// function validateForm(siteName,siteUrl) {
-//     console.log('entro');
-    
-//     if (!siteName || !siteUrl) {
-//         alert('llenar el formulario');
-//         return false;
-//     }
+function validateInput(name, url) {
+    const urlRegex = "https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_\\+.~#?&//=]*)";
+    let isValidName = (name.trim() !== "");
+    let isValidUrl = (url.match(urlRegex));
 
-//     let expression = /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi;
-//     let regex = new RegExp(expression);
+    return isValidName && isValidUrl;
+}
 
-//     if (!siteUrl.match(regex)) {
-//     alert('llenar url');
-//         return false;  
-//     }
-//     console.log('paso');
-    
-//     return true;
-// }
+function createId() {
+    return ('_' + Math.random().toString(36).substr(2, 9));
 
+}
 
+function save() {
+    M.toast({
+        html: 'Marcador agregado',
+        displayLength: 10000,
+        classes: "green rounded"
+    })
+}
 
+function notification(e) {
+    switch (e) {
+        case 1:
+            M.toast({
+                html: 'Marcador agregado',
+                displayLength: 2000,
+                classes: "green rounded"
+            })
+            break;
+        case 2:
+            M.toast({
+                html: 'Campo invalido',
+                displayLength: 2000,
+                classes: "red rounded"
+            })
+            break;
+        case 3:
+            M.toast({
+                html: 'Marcador Borrado',
+                displayLength: 2000,
+                classes: "gray rounded"
+            })
+            break;
+    }
+}
 
 myForm.addEventListener('submit', savebookmark);
