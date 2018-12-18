@@ -5,6 +5,9 @@ let bookmarksResult = document.querySelector('#bookmarksResult');
 
 //Guarda la informacion del usuario
 function savebookmark(e) {
+    //Permite visualizar el submit
+    e.preventDefault();
+
 
     let bookmark = {
         id: createId(),
@@ -32,31 +35,33 @@ function savebookmark(e) {
             localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
         }
         notification(1)
+        //validacion (1) es valido y se creado
     } else {
-        notification(2)
+        if (!bookmark.name) {
+            //No es valido (2) Falla campo nombre
+            notification(2);
+        } else {
+            //No es valido(3) Falla campo URL
+            notification(3)
+        }
 
     }
-
-
     fetchBookmarks();
-    //Permite visualizar el submit
-    e.preventDefault();
 }
 
-function deleteBookmark(url) {
+function deleteBookmark(id) {
     console.log("Entro");
 
     let bookmarks = JSON.parse(localStorage.getItem('bookmarks'));
+    //filter
+    const eliminado = bookmarks.filter(e => e.id === id)[0];
+    const index = bookmarks.indexOf(eliminado);
+    bookmarks.splice(index, 1);
 
-    for (let index = 0; index < bookmarks.length; index++) {
-        if (bookmarks[index].url == url) {
-            bookmarks.splice(index, 1);
-        }
-    }
     //Re-set el LocalStorage
     localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
     fetchBookmarks();
-    notification(3)
+    notification(4)
 }
 
 function fetchBookmarks() {
@@ -66,26 +71,26 @@ function fetchBookmarks() {
     console.log(bookmarks);
 
     bookmarksResult.innerHTML = '';
-
+    //map
     for (let index = 0; index < bookmarks.length; index++) {
+        let id = bookmarks[index].id;
         let name = bookmarks[index].name;
         let url = bookmarks[index].url;
 
-        bookmarksResult.innerHTML += '<div class="divider white-text"></div>' +
-            '<div class="row">' +
-            '<div class="col s12 m12 l12">' +
-            '<div class="card #e65100 orange darken-4" style:border-radius: 2% 2% 2% 2%;>' +
-            '<div class="card-content white-text">' +
-            '<span class="card-title center-align">' +
-            name +
-            '</span>' +
-            '</div>' +
-            '<div class="card-action center-align">' +
-            '<a onclick = "deleteBookmark(\'' + url + '\')" class="waves-effect waves-light btn  #e53935 red darken-1">Delete</a>' +
-            '<a href="' + url + '" class="waves-effect waves-light btn #1e88e5 blue darken-1">Visit</a>' +
-            ' </div>' +
-            '</div>' +
-            '</div>';
+        bookmarksResult.innerHTML +=
+            `<div class="row">
+                <div class="col s12 m12">
+                    <div class="card blue-grey darken-1">
+                        <div class="card-content white-text">
+                            <span class="card-title">${name}</span>
+                        </div>
+                        <div class="card-action center-align">
+                            <a onclick = "deleteBookmark('${id}')" class="waves-effect waves-light btn red">Delete</a>
+                            <a class="waves-effect waves-light btn blue" href="${url}">Visit</a>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
     }
 
 }
@@ -103,35 +108,35 @@ function createId() {
 
 }
 
-function save() {
-    M.toast({
-        html: 'Marcador agregado',
-        displayLength: 10000,
-        classes: "green rounded"
-    })
-}
 
 function notification(e) {
     switch (e) {
         case 1:
             M.toast({
-                html: 'Marcador agregado',
+                html: 'Added bookmark',
                 displayLength: 2000,
                 classes: "green rounded"
             })
             break;
         case 2:
             M.toast({
-                html: 'Campo invalido',
+                html: 'Empty name field',
                 displayLength: 2000,
                 classes: "red rounded"
             })
             break;
         case 3:
             M.toast({
-                html: 'Marcador Borrado',
+                html: 'Empty URL field',
                 displayLength: 2000,
-                classes: "gray rounded"
+                classes: "red rounded"
+            })
+            break;
+        case 4:
+            M.toast({
+                html: 'Deleted marker',
+                displayLength: 2000,
+                classes: "red rounded"
             })
             break;
     }
